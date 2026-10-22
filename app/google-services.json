@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406517592698",
+    "project_id": "shaplabd",
+    "storage_bucket": "shaplabd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406517592698:android:e6e9bbfb5bcc565b8041c3",
+        "android_client_info": {
+          "package_name": "com.shapla.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK7XO-pDi_uHFDjus3i9bhQgidbqhsvBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
