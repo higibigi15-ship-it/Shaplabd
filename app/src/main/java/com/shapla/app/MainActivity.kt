@@ -17,31 +17,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.graphics.drawscope.rotate
 
 private val ShaplaBackground = Color(0xFFF4F9F5)
 private val ShaplaGreen = Color(0xFF087F4F)
 private val ShaplaDark = Color(0xFF292929)
 private val ShaplaGrey = Color(0xFF777777)
+private val ShaplaGold = Color(0xFFFFD166)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MaterialTheme {
                 ShaplaWelcomeScreen(
                     onGetStarted = {
-                        // Connect the next screen here later.
+                        // Next screen will be connected later.
                     }
                 )
             }
@@ -66,13 +67,18 @@ fun ShaplaWelcomeScreen(
                 .background(ShaplaBackground)
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 28.dp, vertical = 16.dp),
+                .padding(
+                    horizontal = 28.dp,
+                    vertical = 16.dp
+                ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
             ShaplaFlowerLogo(
-                modifier = Modifier.size(if (compactScreen) 82.dp else 104.dp)
+                modifier = Modifier.size(
+                    if (compactScreen) 82.dp else 104.dp
+                )
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -106,9 +112,6 @@ fun ShaplaWelcomeScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ShaplaGreen,
                     contentColor = Color.White
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp
                 )
             ) {
                 Text(
@@ -146,43 +149,55 @@ fun ShaplaFlowerLogo(
     modifier: Modifier = Modifier
 ) {
     Canvas(modifier = modifier) {
-        val center = Offset(size.width / 2f, size.height / 2f)
-        val petalWidth = size.width * 0.27f
-        val petalHeight = size.height * 0.43f
+        val center = Offset(
+            x = size.width / 2f,
+            y = size.height / 2f
+        )
 
+        val petalWidth = size.width * 0.25f
+        val petalHeight = size.height * 0.40f
+
+        // Draw five green petals without quadratic curves.
         for (angle in listOf(0f, 72f, 144f, 216f, 288f)) {
-            rotate(degrees = angle, pivot = center) {
-                val path = Path().apply {
-                    moveTo(center.x, center.y + size.height * 0.12f)
-                    quadraticTo(
+            rotate(
+                degrees = angle,
+                pivot = center
+            ) {
+                val petal = Path().apply {
+                    moveTo(
+                        center.x,
+                        center.y + size.height * 0.12f
+                    )
+                    lineTo(
                         center.x - petalWidth,
-                        center.y - petalHeight * 0.45f,
+                        center.y - petalHeight * 0.35f
+                    )
+                    lineTo(
                         center.x,
                         center.y - petalHeight
                     )
-                    quadraticTo(
+                    lineTo(
                         center.x + petalWidth,
-                        center.y - petalHeight * 0.45f,
-                        center.x,
-                        center.y + size.height * 0.12f
+                        center.y - petalHeight * 0.35f
                     )
                     close()
                 }
 
                 drawPath(
-                    path = path,
+                    path = petal,
                     color = ShaplaGreen
                 )
+
                 drawPath(
-                    path = path,
-                    color = Color.White.copy(alpha = 0.8f),
+                    path = petal,
+                    color = Color.White,
                     style = Stroke(width = 1.2.dp.toPx())
                 )
             }
         }
 
         drawCircle(
-            color = Color(0xFFFFD166),
+            color = ShaplaGold,
             radius = size.minDimension * 0.065f,
             center = center
         )
