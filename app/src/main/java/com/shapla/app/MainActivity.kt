@@ -4,202 +4,217 @@ package com.shapla.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val ShaplaBackground = Color(0xFFF4F9F5)
-private val ShaplaGreen = Color(0xFF087F4F)
-private val ShaplaDark = Color(0xFF292929)
-private val ShaplaGrey = Color(0xFF777777)
-private val ShaplaGold = Color(0xFFFFD166)
+private val Green = Color(0xFF087F4F)
+private val Background = Color(0xFFF4F9F5)
+private val Dark = Color(0xFF292929)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MaterialTheme {
-                ShaplaWelcomeScreen(
-                    onGetStarted = {
-                        // Next screen will be connected later.
-                    }
-                )
+                ShaplaLoginScreen()
             }
         }
     }
 }
 
 @Composable
-fun ShaplaWelcomeScreen(
-    onGetStarted: () -> Unit
-) {
-    val configuration = LocalConfiguration.current
-    val compactScreen = configuration.screenHeightDp < 650
+fun ShaplaLoginScreen() {
+    var phone by remember { mutableStateOf("") }
+    var otp by remember { mutableStateOf("") }
+    var otpMode by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf("") }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = ShaplaBackground
+        color = Background
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ShaplaBackground)
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(
-                    horizontal = 28.dp,
-                    vertical = 16.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
-            ShaplaFlowerLogo(
-                modifier = Modifier.size(
-                    if (compactScreen) 82.dp else 104.dp
-                )
+            Text(
+                text = "❀",
+                fontSize = 64.sp,
+                color = Green
             )
-
-            Spacer(modifier = Modifier.height(18.dp))
 
             Text(
                 text = "শাপলা",
-                fontSize = if (compactScreen) 34.sp else 40.sp,
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
-                color = ShaplaGreen,
-                textAlign = TextAlign.Center
+                color = Green
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "কাজ, সেবা, সব একসাথে।",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Normal,
-                color = ShaplaDark,
+                text = if (otpMode) {
+                    "আপনার OTP কোড লিখুন"
+                } else {
+                    "কাজ, সেবা, সব একসাথে।"
+                },
+                fontSize = 16.sp,
+                color = Dark,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(34.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            Button(
-                onClick = onGetStarted,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ShaplaGreen,
-                    contentColor = Color.White
+            if (!otpMode) {
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = {
+                        phone = it.filter { ch -> ch.isDigit() }
+                            .take(10)
+                        message = ""
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("মোবাইল নম্বর") },
+                    placeholder = { Text("1XXXXXXXXX") },
+                    prefix = { Text("+880 ") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone
+                    ),
+                    shape = RoundedCornerShape(14.dp)
                 )
-            ) {
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    onClick = {
+                        if (phone.length == 10 &&
+                            phone.startsWith("1")
+                        ) {
+                            otpMode = true
+                            message =
+                                "ডেমো মোড: বাস্তব SMS OTP এখনো যুক্ত হয়নি।"
+                        } else {
+                            message =
+                                "সঠিক ১০ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।"
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Green
+                    )
+                ) {
+                    Text(
+                        text = "OTP-এর জন্য এগিয়ে যান",
+                        fontSize = 16.sp
+                    )
+                }
+            } else {
                 Text(
-                    text = "শুরু করুন",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = "+880 $phone",
+                    color = Green,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = otp,
+                    onValueChange = {
+                        otp = it.filter { ch -> ch.isDigit() }
+                            .take(6)
+                        message = ""
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("৬ সংখ্যার OTP") },
+                    placeholder = { Text("••••••") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    shape = RoundedCornerShape(14.dp)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    onClick = {
+                        message =
+                            "বাস্তব OTP যাচাই এখনো সেটআপ করা হয়নি।"
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Green
+                    )
+                ) {
+                    Text(
+                        text = "OTP যাচাই করুন",
+                        fontSize = 17.sp
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+                        otpMode = false
+                        otp = ""
+                        message = ""
+                    }
+                ) {
+                    Text(
+                        text = "নম্বর পরিবর্তন করুন",
+                        color = Green
+                    )
+                }
+            }
+
+            if (message.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = message,
+                    color = if (otpMode &&
+                        message.startsWith("বাস্তব")
+                    ) Dark else Green,
+                    textAlign = TextAlign.Center,
+                    fontSize = 13.sp
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Text(
                 text = "Designed & Owned by",
-                fontSize = 12.sp,
-                fontStyle = FontStyle.Italic,
-                color = ShaplaGrey,
-                textAlign = TextAlign.Center
+                color = Color.Gray,
+                fontSize = 12.sp
             )
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = "Mohammad Israfil Hossain",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = ShaplaGrey,
-                textAlign = TextAlign.Center
+                color = Color.Gray,
+                fontSize = 13.sp
             )
         }
-    }
-}
-
-@Composable
-fun ShaplaFlowerLogo(
-    modifier: Modifier = Modifier
-) {
-    Canvas(modifier = modifier) {
-        val center = Offset(
-            x = size.width / 2f,
-            y = size.height / 2f
-        )
-
-        val petalWidth = size.width * 0.25f
-        val petalHeight = size.height * 0.40f
-
-        // Draw five green petals without quadratic curves.
-        for (angle in listOf(0f, 72f, 144f, 216f, 288f)) {
-            rotate(
-                degrees = angle,
-                pivot = center
-            ) {
-                val petal = Path().apply {
-                    moveTo(
-                        center.x,
-                        center.y + size.height * 0.12f
-                    )
-                    lineTo(
-                        center.x - petalWidth,
-                        center.y - petalHeight * 0.35f
-                    )
-                    lineTo(
-                        center.x,
-                        center.y - petalHeight
-                    )
-                    lineTo(
-                        center.x + petalWidth,
-                        center.y - petalHeight * 0.35f
-                    )
-                    close()
-                }
-
-                drawPath(
-                    path = petal,
-                    color = ShaplaGreen
-                )
-
-                drawPath(
-                    path = petal,
-                    color = Color.White,
-                    style = Stroke(width = 1.2.dp.toPx())
-                )
-            }
-        }
-
-        drawCircle(
-            color = ShaplaGold,
-            radius = size.minDimension * 0.065f,
-            center = center
-        )
     }
 }
