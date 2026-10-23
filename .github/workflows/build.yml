@@ -1,4 +1,3 @@
-
 name: Build Shapla APK
 
 on:
@@ -30,7 +29,10 @@ jobs:
           gradle-version: '8.7'
 
       - name: Show SHA fingerprints
-        run: gradle signingReport --no-daemon
+        run: |
+          gradle signingReport --no-daemon --console=plain 2>&1 | tee signing-report.txt
+          echo "========== SIGNING FINGERPRINTS =========="
+          grep -i -E 'Variant:|Config:|SHA1:|SHA-1:|SHA-256:' signing-report.txt || true
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
@@ -40,3 +42,10 @@ jobs:
         with:
           name: Shapla-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Save signing report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shapla-Signing-Report
+          path: signing-report.txt
+          if-no-files-found: ignore
