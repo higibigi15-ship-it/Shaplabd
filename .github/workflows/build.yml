@@ -1,3 +1,4 @@
+
 name: Build Shapla APK
 
 on:
@@ -27,6 +28,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+
+      - name: Show SHA fingerprints
+        run: gradle signingReport --no-daemon
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
