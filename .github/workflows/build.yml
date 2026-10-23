@@ -1,4 +1,3 @@
-
 name: Build Shapla APK
 
 on:
@@ -27,7 +26,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.2'
+          gradle-version: '8.7'
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
