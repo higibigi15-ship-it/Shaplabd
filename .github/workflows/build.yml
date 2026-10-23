@@ -29,12 +29,12 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Generate Debug Keystore and Show SHA Fingerprints
+      - name: Generate Debug Keystore
         shell: bash
         run: |
-          mkdir -p "$HOME/.config/.android"
-          keytool -genkeypair -v \
-            -keystore "$HOME/.config/.android/debug.keystore" \
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair \
+            -keystore "$HOME/.android/debug.keystore" \
             -storepass android \
             -keypass android \
             -alias androiddebugkey \
@@ -43,10 +43,13 @@ jobs:
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
 
-          gradle signingReport --no-daemon --console=plain 2>&1 | tee signing-report.txt
-
-          echo "========== SIGNING FINGERPRINTS =========="
-          grep -i -E 'Variant:|Config:|Store:|Alias:|SHA1:|SHA-1:|SHA-256:' signing-report.txt || true
+      - name: Show SHA fingerprints
+        shell: bash
+        run: |
+          keytool -list -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
@@ -58,6 +61,7 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Save signing report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Shapla-Signing-Report
