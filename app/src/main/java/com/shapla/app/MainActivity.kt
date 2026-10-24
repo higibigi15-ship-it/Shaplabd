@@ -245,3 +245,13 @@ fun ShaplaLoginScreen() {
         }
     }
 }
+
+@Composable
+fun ShaplaLogo(modifier: Modifier = Modifier) {
+    Text(
+        text = "❀",
+        modifier = modifier,
+        fontSize = 64.sp,
+        color = ShaplaGreen
+    )
+}
